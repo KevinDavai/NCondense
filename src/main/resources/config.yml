@@ -1,0 +1,31 @@
+# All condense recipe availables
+# You can add as many recipes you want
+# See wiki for more details
+# https://wiki.nours.dev/autocondenser
+
+test-dev: 'salut'
+
+recipes:
+    recipe1:
+      input-item:
+        material: WHEAT
+        name: '&4My Custom Wheat'
+        input-number: 9
+      output-item:
+        material: WHEAT
+        name: '&4My Custom Wheat [Tier 2]'
+        output-number: 1
+      permission: 'autocondense.recipe1'
+      is-auto-condensable: true
+
+# Condeser tool
+condense-tool:
+  diamond-tier:
+    material: STICK
+    durability: 100
+    display-name: "&3Condenser tool"
+    lore:
+      - "&7Right click a block with an"
+      - "&7inventory to compress the"
+      - "&7contents."
+      - "&4&lDurability: &7{current_durability} / {max_durability}"
