@@ -2,14 +2,11 @@
 # You can add as many recipes you want
 # See wiki for more details
 # https://wiki.nours.dev/autocondenser
-
-test-dev: 'salut'
-
 recipes:
     recipe1:
       input-item:
         material: WHEAT
-        name: '&4My Custom Wheat'
+        name: '&4My Custom Wheat [Tier 1]'
         input-number: 9
       output-item:
         material: WHEAT
@@ -17,6 +14,15 @@ recipes:
         output-number: 1
       permission: 'autocondense.recipe1'
       is-auto-condensable: true
+    recipe2:
+      input-item:
+        material: IRON_NUGGET
+        input-number: 9
+      output-item:
+        material: IRON_INGOT
+        output-number: 1
+      permission: 'autocondense.recipe2'
+      is-auto-condensable: false
 
 # Condeser tool
 condense-tool:
@@ -29,3 +35,6 @@ condense-tool:
       - "&7inventory to compress the"
       - "&7contents."
       - "&4&lDurability: &7{current_durability} / {max_durability}"
+
+
+# TODO: Crafting table condenser

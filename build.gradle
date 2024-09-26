@@ -52,9 +52,11 @@ processResources {
 def serverPluginDir = "C:/Users/Kevin/Desktop/Dev/Minecraft/SERVEUR/plugins"
 def pluginJarName = "NCondense-1.0.0-all"
 
+// BuildDir is deprecated in Gradle
+
 tasks.register('copyPluginToServer', Copy) {
     dependsOn build
-    from("$buildDir/libs/${pluginJarName}.jar")
+    from(layout.buildDirectory.file("libs/${pluginJarName}.jar"))
     into(serverPluginDir)
 }
 
