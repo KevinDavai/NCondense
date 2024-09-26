@@ -6,10 +6,8 @@ import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
-import org.bukkit.inventory.Recipe;
 
 import javax.annotation.Nullable;
-import java.util.Collections;
 import java.util.List;
 
 public class CondenseCommand implements CommandHandler {
@@ -22,27 +20,23 @@ public class CondenseCommand implements CommandHandler {
 
     @Override
     public void handle(CommandSender sender, String[] args) {
-        if (!(sender instanceof Player)) {
+        if (!(sender instanceof Player player)) {
             sender.sendMessage(ChatColor.RED + "This command can only be executed by a player.");
             return;
         }
-        Player player = (Player) sender;
 
         Inventory inventory = player.getInventory();
 
-        // Get the recipes from the config
+        // Get the recipes from the recipe manager
         List<RecipeModel> recipes = plugin.getRecipeManager().getRecipes();
 
-        // Loop through the recipes
+        // Loop through the recipes and craft them
         for (RecipeModel recipe : recipes) {
-            // Check if the recipe can be crafted
-            if (recipe.canCraft(inventory)) {
-                // Craft the recipe
+            // Check if the player has permission to use the recipe
+            // If they don't, skip to the next recipe
+            if(!player.hasPermission(recipe.getPermission())) continue;
 
-
-                recipe.craft(inventory);
-                return;
-            }
+            recipe.craft(inventory);
         }
 
     }

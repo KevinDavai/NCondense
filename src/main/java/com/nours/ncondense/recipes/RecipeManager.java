@@ -15,11 +15,11 @@ public class RecipeManager {
 
     public void loadRecipes() {
         // Load the recipes from the config
-        List<RecipeModel> recipes = plugin.getConfigsManager().getRecipes();
-        this.recipes = recipes;
+        this.recipes = plugin.getConfigsManager().getRecipes();
     }
 
     public List<RecipeModel> getRecipes() {
         return recipes;
     }
+
 }

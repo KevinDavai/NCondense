@@ -5,7 +5,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabExecutor;
-import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nullable;
 import java.util.List;
@@ -24,6 +24,7 @@ public class NCondenseCommandManager extends BaseCommandManager implements TabEx
 
         // Register condense subcommand
         subcommands.put("condense", new CondenseCommand(plugin));
+        subcommands.put("autocondense", new AutoCondenseCommand(plugin));
     }
 
 
@@ -43,12 +44,12 @@ public class NCondenseCommandManager extends BaseCommandManager implements TabEx
 
     @Override
     public @Nullable String getPermission() {
-        return null;  // General permission for /ncondense if needed
+        return null;
     }
 
 
     @Override
-    public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
+    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, String[] args) {
         super.handle(sender, args);
         return true;
     }
@@ -56,7 +57,7 @@ public class NCondenseCommandManager extends BaseCommandManager implements TabEx
 
     @Nullable
     @Override
-    public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
+    public List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String alias, String[] args) {
         return super.tabComplete(sender, args);
     }
 

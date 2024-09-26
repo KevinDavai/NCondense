@@ -5,51 +5,27 @@ import org.bukkit.Material;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
-/**
- *
- * recipes:
- *     recipe1:
- *       input-item:
- *         material: WHEAT
- *         name: '&4My Custom Wheat [Tier 1]'
- *         input-number: 9
- *       output-item:
- *         material: WHEAT
- *         name: '&4My Custom Wheat [Tier 2]'
- *         output-number: 1
- *       permission: 'autocondense.recipe1'
- *       is-auto-condensable: true
- *     recipe2:
- *       input-item:
- *         material: IRON_NUGGET
- *         input-number: 9
- *       output-item:
- *         material: IRON_INGOT
- *         output-number: 1
- *       permission: 'autocondense.recipe2'
- *       is-auto-condensable: false
- *
- */
+import java.util.HashMap;
 
 public class RecipeModel {
 
-    private String id;
+    private final String id;
 
-    private Material inputMaterial;
+    private final Material inputMaterial;
 
-    private String inputName;
+    private final String inputName;
 
-    private int inputNumber;
+    private final int inputNumber;
 
-    private int outputNumber;
+    private final int outputNumber;
 
-    private Material outputMaterial;
+    private final Material outputMaterial;
 
-    private String outputName;
+    private final String outputName;
 
-    private String permission;
+    private final String permission;
 
-    private boolean isAutoCondensable;
+    private final boolean isAutoCondensable;
 
     public RecipeModel(String id, Material inputMaterial, String inputName, int inputNumber, int outputNumber, Material outputMaterial, String outputName, String permission, boolean isAutoCondensable) {
         this.id = id;
@@ -111,59 +87,56 @@ public class RecipeModel {
         plugin.getLogger().info("Is Auto Condensable: " + isAutoCondensable);
     }
 
-    public boolean canCraft(Inventory inventory) {
-        int count = 0;
-        // TODO: Check name / etc
-        for (int i = 0; i < inventory.getSize(); i++) {
-            if (inventory.getItem(i) != null && inventory.getItem(i).getType() == inputMaterial) {
-                count += inventory.getItem(i).getAmount();
-            }
-        }
-        return count >= inputNumber;
-    }
 
+    /**
+     * Craft the recipe
+     * @param inventory
+     */
     public void craft(Inventory inventory) {
-        int maxCrafts = 0;
-        int totalInputCount = 0;
+        int validRecipeItemCount = getValidRecipeItemCount(inventory);
+        int maxCraft = validRecipeItemCount / inputNumber;
+        int itemsToRemove = maxCraft * inputNumber;
 
-        for(int i = 0; i < inventory.getSize(); i++) {
-            ItemStack item = inventory.getItem(i);
-            if(item != null && item.getType() == inputMaterial) {
-                totalInputCount += item.getAmount();
-            }
-        }
-
-        maxCrafts = totalInputCount / inputNumber;
-
-        if(maxCrafts == 0) {
+        if(maxCraft == 0) {
             return;
         }
 
-        int itemsToRemove = maxCrafts * inputNumber;
+        HashMap<Integer, ItemStack> remaining = inventory.addItem(new ItemStack(outputMaterial, maxCraft * outputNumber));
+        inventory.removeItem(new ItemStack(inputMaterial, itemsToRemove));
 
+        // Drop the remaining items on the ground
+        if(!remaining.isEmpty()) {
+            remaining.forEach((index, item) -> {
+                inventory.getLocation().getWorld().dropItem(inventory.getLocation(), item);
+            });
+        }
+    }
+
+    /**
+     * Get the number of valid recipe items in the inventory
+     * @param inventory
+     * @return the number of valid recipe items
+     */
+    private int getValidRecipeItemCount(Inventory inventory) {
+        int validItems = 0;
 
         for(int i = 0; i < inventory.getSize(); i++) {
             ItemStack item = inventory.getItem(i);
-            if(item != null && item.getType() == inputMaterial) {
-
-                if(itemsToRemove > 0) {
-                    int amountToRemove = Math.min(item.getAmount(), itemsToRemove);
-                    item.setAmount(item.getAmount() - amountToRemove);
-                    itemsToRemove -= amountToRemove;
-                }
-
-                if(item.getAmount() == 0) {
-                    inventory.setItem(i, null);
-                }
-            }
-
-            if(itemsToRemove <= 0) {
-                break;
+            if(isValidRecipeItem(item)) {
+                validItems += item.getAmount();
             }
         }
 
-        int totalOutput = maxCrafts * outputNumber;
-        ItemStack outputItem = new ItemStack(outputMaterial, totalOutput);
-        inventory.addItem(outputItem);
+        return validItems;
+    }
+
+
+    /**
+     * Check if the item is a valid recipe item
+     * @param item
+     * @return true if the item is a valid recipe item
+     */
+    private boolean isValidRecipeItem(ItemStack item) {
+        return item != null && item.getType() == inputMaterial;
     }
 }
