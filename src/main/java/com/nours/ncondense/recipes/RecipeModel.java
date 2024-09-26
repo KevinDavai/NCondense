@@ -90,7 +90,7 @@ public class RecipeModel {
 
     /**
      * Craft the recipe
-     * @param inventory
+     * @param inventory - the inventory to craft the recipe in
      */
     public void craft(Inventory inventory) {
         int validRecipeItemCount = getValidRecipeItemCount(inventory);
@@ -106,15 +106,13 @@ public class RecipeModel {
 
         // Drop the remaining items on the ground
         if(!remaining.isEmpty()) {
-            remaining.forEach((index, item) -> {
-                inventory.getLocation().getWorld().dropItem(inventory.getLocation(), item);
-            });
+            remaining.forEach((index, item) -> inventory.getLocation().getWorld().dropItem(inventory.getLocation(), item));
         }
     }
 
     /**
      * Get the number of valid recipe items in the inventory
-     * @param inventory
+     * @param inventory - the inventory to check
      * @return the number of valid recipe items
      */
     private int getValidRecipeItemCount(Inventory inventory) {
@@ -133,7 +131,7 @@ public class RecipeModel {
 
     /**
      * Check if the item is a valid recipe item
-     * @param item
+     * @param item - the item to check
      * @return true if the item is a valid recipe item
      */
     private boolean isValidRecipeItem(ItemStack item) {

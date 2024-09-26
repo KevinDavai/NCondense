@@ -56,14 +56,12 @@ public class NPlayerManager {
 
     private void takeInventorySnapshots() {
         for (Player player : autoCondensePlayers.keySet()) {
-            // Take a snapshot of the player's inventory contents
-            ItemStack[] currentContents = player.getInventory().getContents();
-
             // Pass the snapshot to an async task for comparison
             Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
                 List<RecipeModel> recipes = plugin.getRecipeManager().getRecipes();
                 for (RecipeModel recipe : recipes) {
-                    plugin.getLogger().info("Checking recipe: " + recipe.getId());
+                    if(!recipe.isAutoCondensable()) continue;
+
                     if (player.hasPermission(recipe.getPermission())) {
                         recipe.craft(player.getInventory());
                     }
