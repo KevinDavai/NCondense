@@ -4,7 +4,7 @@ import com.nours.ncondense.NCondense;
 import com.nours.ncondense.recipes.RecipeModel;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.List;
@@ -42,8 +42,10 @@ public class NPlayerManager {
     }
 
     public void startAutoCondenseTask() {
+        if(!plugin.getConfigsManager().isAutoCondenseEnabled()) return;
+
         // Schedule the task to run every X seconds (20 ticks = 1 second)
-        int seconds = 1;
+        int seconds = plugin.getConfigsManager().getAutoCondenseInterval();
         int ticks = seconds * 20;
 
         new BukkitRunnable() {
@@ -54,20 +56,32 @@ public class NPlayerManager {
         }.runTaskTimer(plugin, 0, ticks);
     }
 
+    public void stopAutoCondenseTask() {
+        Bukkit.getScheduler().cancelTasks(plugin);
+    }
+
     private void takeInventorySnapshots() {
         for (Player player : autoCondensePlayers.keySet()) {
-            // Pass the snapshot to an async task for comparison
             Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
                 List<RecipeModel> recipes = plugin.getRecipeManager().getRecipes();
                 for (RecipeModel recipe : recipes) {
                     if(!recipe.isAutoCondensable()) continue;
 
-                    if (player.hasPermission(recipe.getPermission())) {
-                        recipe.craft(player.getInventory());
-                    }
+                    // Check if the player has the permission to craft the recipe
+                    if (!player.hasPermission(recipe.getPermission())) continue;
+
+                    // Check if the player is in a blacklisted world
+                    if(plugin.getConfigsManager().getBlacklistedWorlds().contains(player.getWorld().getName())) continue;
+
+                    Inventory playerInventory = player.getInventory();
+
+                    // Check if the player has the minimum number of items needed to craft the recipe
+                    if(!recipe.hasMinItems(playerInventory)) continue;
+
+                    // Craft the recipe
+                    recipe.craft(playerInventory);
                 }
             });
-
         }
     }
 

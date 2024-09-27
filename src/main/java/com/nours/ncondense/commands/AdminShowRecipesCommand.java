@@ -1,7 +1,6 @@
 package com.nours.ncondense.commands;
 
 import com.nours.ncondense.NCondense;
-import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 
 import javax.annotation.Nullable;

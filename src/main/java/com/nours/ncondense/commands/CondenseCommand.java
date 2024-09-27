@@ -48,6 +48,6 @@ public class CondenseCommand implements CommandHandler {
 
     @Override
     public @Nullable String getPermission() {
-        return "ncodense.condense";
+        return "ncondense.condense";
     }
 }

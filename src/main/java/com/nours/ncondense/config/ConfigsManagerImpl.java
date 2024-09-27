@@ -8,7 +8,6 @@ import org.bukkit.configuration.ConfigurationSection;
 
 
 import java.io.File;
-import java.sql.Array;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
@@ -16,6 +15,11 @@ import java.util.logging.Level;
 public class ConfigsManagerImpl {
     private final NCondense plugin;
     private CommentedConfiguration config;
+
+    private boolean autoCondenseEnabled;
+    private int autoCondenseInterval;
+    private int minItemsToCondense;
+    private List<String> blacklistedWorlds;
 
     private static final String[] IGNORED_SECTIONS = new String[] {
             "recipes"
@@ -40,10 +44,15 @@ public class ConfigsManagerImpl {
         } catch (Exception e) {
             plugin.getLogger().log(Level.SEVERE, "Error while syncing the config file", e);
         }
+
+        loadConfigValues();
     }
 
-    public void updateValue(String key, Object value) {
-        // Update the value of the key in the config
+    private void loadConfigValues() {
+        autoCondenseEnabled = config.getBoolean("auto-condense.enabled", true);
+        autoCondenseInterval = config.getInt("auto-condense.interval", 1);
+        minItemsToCondense = config.getInt("auto-condense.min-items", 0);
+        blacklistedWorlds = config.getStringList("auto-condense.blacklisted-worlds");
     }
 
     public CommentedConfiguration getConfig() {
@@ -73,21 +82,36 @@ public class ConfigsManagerImpl {
             ConfigurationSection outputItemSection = recipeSection.getConfigurationSection("output-item");
 
             Material inputMaterial =  Material.getMaterial(inputItemSection.getString("material"));
-            String inputName = inputItemSection.getString("name");
+            String inputName = inputItemSection.getString("display-name");
             int inputNumber = inputItemSection.getInt("input-number");
 
             Material outputMaterial = Material.getMaterial(outputItemSection.getString("material"));
-            String outputName = outputItemSection.getString("name");
+            String outputName = outputItemSection.getString("display-name");
             int outputNumber = outputItemSection.getInt("output-number");
 
             String permission = recipeSection.getString("permission");
             boolean isAutoCondensable = recipeSection.getBoolean("is-auto-condensable");
 
-            RecipeModel recipe = new RecipeModel(recipeKey, inputMaterial, inputName, inputNumber, outputNumber, outputMaterial, outputName, permission, isAutoCondensable);
+            RecipeModel recipe = new RecipeModel(plugin, recipeKey, inputMaterial, inputName, inputNumber, outputNumber, outputMaterial, outputName, permission, isAutoCondensable);
             recipes.add(recipe);
         }
 
         return recipes;
     }
 
+    public boolean isAutoCondenseEnabled() {
+        return autoCondenseEnabled;
+    }
+
+    public int getAutoCondenseInterval() {
+        return autoCondenseInterval;
+    }
+
+    public int getMinItemsToCondense() {
+        return minItemsToCondense;
+    }
+
+    public List<String> getBlacklistedWorlds() {
+        return blacklistedWorlds;
+    }
 }

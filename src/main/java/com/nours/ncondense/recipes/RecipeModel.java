@@ -4,10 +4,14 @@ import com.nours.ncondense.NCondense;
 import org.bukkit.Material;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.HashMap;
+import java.util.logging.Logger;
 
 public class RecipeModel {
+
+    private final NCondense plugin;
 
     private final String id;
 
@@ -27,7 +31,8 @@ public class RecipeModel {
 
     private final boolean isAutoCondensable;
 
-    public RecipeModel(String id, Material inputMaterial, String inputName, int inputNumber, int outputNumber, Material outputMaterial, String outputName, String permission, boolean isAutoCondensable) {
+    public RecipeModel(NCondense plugin, String id, Material inputMaterial, String inputName, int inputNumber, int outputNumber, Material outputMaterial, String outputName, String permission, boolean isAutoCondensable) {
+        this.plugin = plugin;
         this.id = id;
         this.inputMaterial = inputMaterial;
         this.inputName = inputName;
@@ -101,13 +106,50 @@ public class RecipeModel {
             return;
         }
 
-        HashMap<Integer, ItemStack> remaining = inventory.addItem(new ItemStack(outputMaterial, maxCraft * outputNumber));
-        inventory.removeItem(new ItemStack(inputMaterial, itemsToRemove));
+        HashMap<Integer, ItemStack> remaining = inventory.addItem(getOutputItemStack(maxCraft * outputNumber));
+        inventory.removeItem(getInputItemStack(itemsToRemove));
 
         // Drop the remaining items on the ground
         if(!remaining.isEmpty()) {
             remaining.forEach((index, item) -> inventory.getLocation().getWorld().dropItem(inventory.getLocation(), item));
         }
+    }
+
+    /**
+     * Check if the inventory has the minimum number of items needed to craft the recipe
+     * @param inventory - the inventory to check
+     * @return true if the inventory has the minimum number of items needed
+     */
+    public boolean hasMinItems(Inventory inventory) {
+        int minRequired = this.plugin.getConfigsManager().getMinItemsToCondense();
+
+        if(minRequired == 0) {
+            return true;
+        }
+
+        int number = this.getValidRecipeItemCount(inventory);
+
+        return number >= minRequired;
+    }
+
+    private ItemStack getInputItemStack(int amount) {
+        ItemStack item = new ItemStack(inputMaterial, amount);
+        ItemMeta meta = item.getItemMeta();
+        if(inputName != null) {
+            meta.setDisplayName(inputName);
+        }
+        item.setItemMeta(meta);
+        return item;
+    }
+
+    private ItemStack getOutputItemStack(int amount) {
+        ItemStack item = new ItemStack(outputMaterial, amount);
+        ItemMeta meta = item.getItemMeta();
+        if(outputName != null) {
+            meta.setDisplayName(outputName);
+        }
+        item.setItemMeta(meta);
+        return item;
     }
 
     /**
@@ -132,9 +174,45 @@ public class RecipeModel {
     /**
      * Check if the item is a valid recipe item
      * @param item - the item to check
-     * @return true if the item is a valid recipe item
+     * @return true if the item matches the recipe criteria
      */
     private boolean isValidRecipeItem(ItemStack item) {
-        return item != null && item.getType() == inputMaterial;
+        if (item == null) {
+            return false; // Item is null, invalid
+        }
+
+        // Check if the item matches the material
+        if (item.getType() != inputMaterial) {
+            return false; // Material does not match
+        }
+
+        // Check the item meta (display name, etc.)
+        if (item.hasItemMeta()) {
+            ItemMeta meta = item.getItemMeta();
+
+            // Check if the item has a display name, and if so, compare with inputName
+            if (meta.hasDisplayName()) {
+
+                if (inputName != null && !meta.getDisplayName().equals(inputName)) {
+                    return false; // Display name exists and doesn't match
+                }
+            } else if (inputName != null) {
+                // If the inputName is provided but the item doesn't have a display name
+                return false;
+            }
+
+            // TODO: Enchant check and custom model data check
+
+            // Additional checks for lore, custom models, etc., can go here if needed
+        } else if (inputName != null) {
+            // If inputName is provided but the item has no ItemMeta (so no display name)
+            return false;
+        }
+
+        if(inputName == null && item.getItemMeta().hasDisplayName()) {
+            return false;
+        }
+
+        return true; // The item matches the recipe criteria
     }
 }

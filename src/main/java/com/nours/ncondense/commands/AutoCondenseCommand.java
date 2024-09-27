@@ -63,6 +63,6 @@ public class AutoCondenseCommand implements CommandHandler {
 
     @Override
     public @Nullable String getPermission() {
-        return "ncodense.autocondense";
+        return "ncondense.autocondense";
     }
 }

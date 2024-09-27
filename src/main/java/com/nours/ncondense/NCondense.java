@@ -15,28 +15,26 @@ public final class NCondense extends JavaPlugin {
 
     @Override
     public void onEnable() {
-        // Plugin startup logic
-
         this.configsManager.loadData();
         this.commandManager.loadCommand();
 
         this.recipeManager.loadRecipes();
 
         this.nPlayerManager.startAutoCondenseTask();
-
-        PlayerPickUpListener playerPickUpListener = new PlayerPickUpListener(this);
-        getServer().getPluginManager().registerEvents(playerPickUpListener, this); // Register the event listener
     }
 
-
     public void reloadPlugin() {
+        this.nPlayerManager.stopAutoCondenseTask();
+
         this.configsManager.loadData();
         this.recipeManager.loadRecipes();
+
+        this.nPlayerManager.startAutoCondenseTask();
     }
 
     @Override
     public void onDisable() {
-        // Plugin shutdown logic
+        this.nPlayerManager.stopAutoCondenseTask();
     }
 
     public ConfigsManagerImpl getConfigsManager() {

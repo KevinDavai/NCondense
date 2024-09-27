@@ -1,7 +1,19 @@
-# All condense recipe availables
-# You can add as many recipes you want
-# See wiki for more details
-# https://wiki.nours.dev/autocondenser
+# Auto condense settings
+auto-condense:
+  # Enable auto condense
+  enabled: true
+  # interval in seconds to check for auto condense
+  interval: 1
+  # min items needed to auto condense per recipes (Set to 0 to disable)
+  min-items: 32
+  # Worlds blacklisted from auto condense (set to [] if you want to enable in all worlds)
+  blacklisted-worlds:
+    - world_nether
+    - world_the_end
+
+
+# Recipes
+# You can add as many recipes as you want
 recipes:
     recipe1:
       input-item:
@@ -37,4 +49,4 @@ condense-tool:
       - "&4&lDurability: &7{current_durability} / {max_durability}"
 
 
-# TODO: Crafting table condenser
+
