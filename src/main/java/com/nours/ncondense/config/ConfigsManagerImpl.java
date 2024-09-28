@@ -1,6 +1,7 @@
 package com.nours.ncondense.config;
 
 import com.nours.ncondense.NCondense;
+import com.nours.ncondense.condenseblocks.CondenseBlockModel;
 import com.nours.ncondense.recipes.RecipeModel;
 import com.nours.ncondense.utils.ConfigUtils;
 import org.bukkit.Material;
@@ -22,7 +23,8 @@ public class ConfigsManagerImpl {
     private List<String> blacklistedWorlds;
 
     private static final String[] IGNORED_SECTIONS = new String[] {
-            "recipes"
+            "recipes",
+            "condenser-block"
     };
 
     public ConfigsManagerImpl(NCondense plugin) {
@@ -97,6 +99,68 @@ public class ConfigsManagerImpl {
         }
 
         return recipes;
+    }
+
+    public List<CondenseBlockModel> getCondenseBlocks() {
+        List<CondenseBlockModel> condenseBlocks = new ArrayList<>();
+
+        ConfigurationSection condenseBlocksSection = config.getConfigurationSection("condenser-block");
+        ConfigurationSection globalRecipesSection = config.getConfigurationSection("recipes");
+
+        if(condenseBlocksSection == null) {
+            plugin.getLogger().warning("No condenser blocks found in the config");
+            return condenseBlocks;
+        }
+
+        for(String blockKey : condenseBlocksSection.getKeys(false)) {
+            ConfigurationSection blockSection = config.getConfigurationSection("condenser-block." + blockKey);
+
+            if(!ConfigUtils.isCondenseBlockValid(blockSection, globalRecipesSection)) {
+                plugin.getLogger().warning("Invalid condenser block, please refer to the documentation for the correct format: " + blockKey);
+                continue;
+            }
+
+            Material material = Material.getMaterial(blockSection.getString("material"));
+
+            // display name is optional
+            String displayName = blockSection.getString("display-name", null);
+
+            // lore is optional, default to an empty list
+            List<String> lore = blockSection.getStringList("lore");
+
+            // custom model data is optional, default to 0
+            int customModelData = blockSection.getInt("custom-model-data", 0);
+
+            // permission is optional
+            String permission = blockSection.getString("permission", null);
+
+            // recipes are optional, default to an empty list
+            List<String> recipes = blockSection.getStringList("recipes");
+
+            // Hologram but guaranteed valid if present
+            boolean hologramEnabled = blockSection.getBoolean("hologram.enabled");
+            List<String> hologramLines = new ArrayList<>();
+
+            if(hologramEnabled) {
+                hologramLines = blockSection.getStringList("hologram.lines");
+            }
+
+            CondenseBlockModel condenseBlock = new CondenseBlockModel(
+                    blockKey,
+                    material,
+                    displayName,
+                    lore,
+                    customModelData,
+                    permission,
+                    recipes,
+                    hologramEnabled,
+                    hologramLines
+            );
+
+            condenseBlocks.add(condenseBlock);
+        }
+
+        return condenseBlocks;
     }
 
     public boolean isAutoCondenseEnabled() {

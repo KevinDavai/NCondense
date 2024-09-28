@@ -38,7 +38,6 @@ public class CondenseCommand implements CommandHandler {
 
             recipe.craft(inventory);
         }
-
     }
 
     @Override

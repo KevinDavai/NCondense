@@ -3,6 +3,8 @@ package com.nours.ncondense.utils;
 import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
 
+import java.util.List;
+
 public class ConfigUtils {
     public static boolean isRecipeValid(ConfigurationSection recipeSection) {
         if(!recipeSection.isConfigurationSection("input-item") || !recipeSection.isConfigurationSection("output-item")) {
@@ -32,12 +34,52 @@ public class ConfigUtils {
         return true;
     }
 
+    public static boolean isCondenseBlockValid(ConfigurationSection blockSection, ConfigurationSection globalRecipesSection) {
+        String materialStr = blockSection.getString("material");
+        if(materialStr == null || !isValidMaterial(materialStr)) {
+            return false; // Missing material
+        }
+
+        if(blockSection.contains("hologram")) {
+            ConfigurationSection hologramSection = blockSection.getConfigurationSection("hologram");
+
+            if(!hologramSection.contains("enabled") && !hologramSection.isBoolean("enabled")) {
+                return false; // Missing enabled or text in hologram section
+            }
+
+            if(!hologramSection.contains("lines") || !hologramSection.isList("lines")) {
+                return false; // Missing lines or invalid lines in hologram section
+            }
+
+            List<String> lines = hologramSection.getStringList("lines");
+            if(lines.isEmpty()) {
+                return false; // Empty lines
+            }
+        }
+
+        // Check if the recipes section exists and contains the listed recipes
+        if (blockSection.contains("recipes")) {
+            List<String> blockRecipes = blockSection.getStringList("recipes");
+
+            // Check if the global recipes section exists and contains the listed recipes
+            for (String recipeKey : blockRecipes) {
+                if (globalRecipesSection == null || !globalRecipesSection.contains(recipeKey)) {
+                    return false; // Invalid recipe key in the condenser block
+                }
+            }
+        }
+
+        // all necessary checks passed, return true
+        return true;
+    }
+
     public static boolean isValidMaterial(String materialName) {
         try {
-            Material material = Material.valueOf(materialName.toUpperCase());
-            return material != null;
+            Material.valueOf(materialName.toUpperCase());
+            return true;
         } catch (IllegalArgumentException e) {
             return false; // Invalid material name
         }
     }
+
 }

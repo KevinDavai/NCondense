@@ -11,42 +11,75 @@ auto-condense:
     - world_nether
     - world_the_end
 
-
 # Recipes
 # You can add as many recipes as you want
+# Set to [] to remove all recipes
 recipes:
-    recipe1:
-      input-item:
-        material: WHEAT
-        name: '&4My Custom Wheat [Tier 1]'
-        input-number: 9
-      output-item:
-        material: WHEAT
-        name: '&4My Custom Wheat [Tier 2]'
-        output-number: 1
-      permission: 'autocondense.recipe1'
-      is-auto-condensable: true
-    recipe2:
-      input-item:
-        material: IRON_NUGGET
-        input-number: 9
-      output-item:
-        material: IRON_INGOT
-        output-number: 1
-      permission: 'autocondense.recipe2'
-      is-auto-condensable: false
+  recipe1:
+    input-item:
+      material: WHEAT
+      name: '&4My Custom Wheat [Tier 1]'
+      input-number: 9
+    output-item:
+      material: WHEAT
+      name: '&4My Custom Wheat [Tier 2]'
+      output-number: 1
+    permission: 'autocondense.recipe1'
+    is-auto-condensable: true
+  recipe2:
+    input-item:
+      material: IRON_NUGGET
+      input-number: 9
+    output-item:
+      material: IRON_INGOT
+      output-number: 1
+    permission: 'autocondense.recipe2'
+    is-auto-condensable: false
 
-# Condeser tool
-condense-tool:
-  diamond-tier:
-    material: STICK
-    durability: 100
-    display-name: "&3Condenser tool"
+# Condenser blocks
+# You can add as many condenser blocks as you want
+# Set to [] to remove all condenser blocks
+condenser-block:
+  my-custom-block:
+    material: CRAFTING_TABLE
+    # display name is optional
+    display-name: '&4My Custom Condenser'
+    # lore is optional
     lore:
-      - "&7Right click a block with an"
-      - "&7inventory to compress the"
-      - "&7contents."
-      - "&4&lDurability: &7{current_durability} / {max_durability}"
+      - '&7This is a custom condenser'
+      - '&7that can be used to'
+      - '&7condense items'
+    # Custom model data optional
+    custom-model-data: 10001
+    # Permission to use this condenser block (Remove if you want to enable for all players)
+    permission: 'autocondense.my-custom-block'
+    # Recipes that can be used in this condenser (Remove if you want to enable all recipes)
+    recipes:
+      - recipe1
+    # Hologram to display above the condenser block
+    # if this condenser block has specific recipes, you can use placeholders (check below)
+    # You can use {recipes-input-item} to display the input item of the recipe
+    # You can use {recipes-output-item} to display the output item of the recipe
+    hologram:
+      enabled: true
+      lines:
+        - '&4My Custom Condenser'
+        - '&7 {recipes-output-item}'
+        - '&7Right click to condense'
+
+  my-second-block:
+    material: CRAFTING_TABLE
+    display-name: '&4My second Condenser'
+    lore:
+      - '&7This is a custom condenser'
+      - '&7that can be used to'
+      - '&7condense items'
+    permission: 'autocondense.my-second-block'
+    hologram:
+      enabled: true
+      lines:
+        - '&4My Custom Condenser'
+        - '&7Right click to condense'
 
 
 

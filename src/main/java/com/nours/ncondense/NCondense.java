@@ -1,9 +1,11 @@
 package com.nours.ncondense;
 
 import com.nours.ncondense.commands.NCondenseCommandManager;
+import com.nours.ncondense.condenseblocks.CondenseBlockManager;
 import com.nours.ncondense.config.ConfigsManagerImpl;
 import com.nours.ncondense.player.NPlayerManager;
 import com.nours.ncondense.recipes.RecipeManager;
+import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public final class NCondense extends JavaPlugin {
@@ -11,6 +13,7 @@ public final class NCondense extends JavaPlugin {
     private final ConfigsManagerImpl configsManager = new ConfigsManagerImpl(this);
     private final NCondenseCommandManager commandManager = new NCondenseCommandManager(this);
     private final RecipeManager recipeManager = new RecipeManager(this);
+    private final CondenseBlockManager condenseBlockManager = new CondenseBlockManager(this);
     private final NPlayerManager nPlayerManager = new NPlayerManager(this);
 
     @Override
@@ -19,6 +22,8 @@ public final class NCondense extends JavaPlugin {
         this.commandManager.loadCommand();
 
         this.recipeManager.loadRecipes();
+        this.condenseBlockManager.loadCondenseBlocks();
+
 
         this.nPlayerManager.startAutoCondenseTask();
     }
@@ -28,6 +33,8 @@ public final class NCondense extends JavaPlugin {
 
         this.configsManager.loadData();
         this.recipeManager.loadRecipes();
+        this.condenseBlockManager.loadCondenseBlocks();
+
 
         this.nPlayerManager.startAutoCondenseTask();
     }
